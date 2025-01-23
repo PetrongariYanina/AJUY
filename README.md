@@ -8,6 +8,7 @@ El proyecto AJUY tiene como finalidad scrapear sitios web para recopilar informa
 - **Rendimiento**: Gracias a FastAPI, AJUY ofrece un alto rendimiento y tiempos de respuesta rápidos.
 - **Simplicidad**: La aplicación es fácil de usar y extender.
 - **Escalabilidad**: Diseñada para crecer y adaptarse a las necesidades cambiantes.
+- **Base de Datos**: Utiliza MongoDB para el almacenamiento eficiente y flexible de los datos recopilados.
 
 ## Funcionalidades Principales
 
@@ -35,6 +36,7 @@ Antes de instalar y ejecutar AJUY, asegúrese de tener instalado:
 
 - **Python 3.8** o superior.
 - **pip**: El gestor de paquetes de Python.
+- **MongoDB**: Asegúrese de tener una instancia de MongoDB en funcionamiento.
 
 ## Instalación
 
@@ -76,6 +78,7 @@ Esto iniciará el servidor en `http://127.0.0.1:8000`. Puede acceder a la docume
 ## Estructura del Proyecto
 
 - **FastAPI/**: Contiene los módulos principales de la aplicación, como rutas y lógica del servidor.
+- **APISEARCH/**: Incluye los scripts y módulos responsables del scraping de datos y su procesamiento.
 - **data/**: Almacena los datos recopilados y procesados por la aplicación.
 - **scripts/**: Incluye:
   - Scripts responsables del scraping.
