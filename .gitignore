@@ -1,2 +1,26 @@
 env
 .env
+proyfinal
+fastapi
+__pycache__
+selenium-server.jar
+.vscode/
+# Logs
+*.log
+embedding_generation.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment
+.env
+*.env
+
+# Virtual environments
+venv/
+.env/
+
+# System files
+.DS_Store
+Thumbs.db
