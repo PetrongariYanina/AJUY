@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+motor
+sentence-transformers
+spacy
+numpy
+fuzzywuzzy
+python-Levenshtein
+pymongo
+spellchecker
