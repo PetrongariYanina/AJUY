@@ -7,6 +7,9 @@ import numpy as np
 import traceback
 import sys
 import pymongo
+from dotenv import load_dotenv
+import os
+
 
 # Configuración del logger para registrar eventos
 logging.basicConfig(
@@ -20,7 +23,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # URL de conexión a la base de datos MongoDB
-MONGO_URI = "mongodb+srv://alopma83:1234@cluster0.anxmn.mongodb.net/Proyecto?retryWrites=true&w=majority"
+load_dotenv()
+MONGO_URI = os.getenv("MONGODB_URL")
 
 # Carga del modelo de embeddings de SentenceTransformer
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
