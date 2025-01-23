@@ -86,10 +86,10 @@ db_client = MongoClient(mongodb_url).Proyecto
 # Configuración de CORS para permitir solicitudes desde el frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Orígenes permitidos
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["*"],  # Métodos permitidos
-    allow_headers=["*"],  # Encabezados permitidos
+    allow_methods=["*"],
+    allow_headers=["*", "ngrok-skip-browser-warning"],
 )
 
 # Carga del modelo de embeddings para procesamiento de texto
