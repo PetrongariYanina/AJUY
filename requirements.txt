@@ -1,0 +1,11 @@
+beautifulsoup4==4.12.2
+requests==2.31.0
+selenium
+setuptools
+browser_use
+langchain-openai
+langchain
+sentence-transformers
+motor
+pymongo
+numpy
