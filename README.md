@@ -1,13 +1,34 @@
 
 # AJUY
 
-AJUY es una aplicación desarrollada con **FastAPI** que permite [descripción breve de la funcionalidad principal de la aplicación].
+El proyecto AJUY tiene como finalidad scrapear sitios web para recopilar información sobre investigadores, sus publicaciones, tesis y patentes, consolidándola en una base de datos unificada. Esto es especialmente útil dado que, generalmente, cada universidad mantiene registros independientes de sus autores y publicaciones.
 
 ## Características
 
 - **Rendimiento**: Gracias a FastAPI, AJUY ofrece un alto rendimiento y tiempos de respuesta rápidos.
 - **Simplicidad**: La aplicación es fácil de usar y extender.
 - **Escalabilidad**: Diseñada para crecer y adaptarse a las necesidades cambiantes.
+- **Base de Datos**: Utiliza MongoDB para el almacenamiento eficiente y flexible de los datos recopilados.
+
+## Funcionalidades Principales
+
+### 1. Web Scraping
+- Los scripts permiten navegar y extraer datos de diversas páginas web académicas y científicas.
+- Se enfocan en recolectar información clave sobre investigadores, incluyendo:
+  - Publicaciones
+  - Tesis dirigidas
+  - Patentes registradas
+
+### 2. Procesamiento y Almacenamiento de Datos
+- Los datos extraídos son procesados para garantizar su calidad y consistencia.
+- La información consolidada se almacena en una base de datos centralizada, facilitando su acceso y análisis.
+
+### 3. Implementación de Inteligencia Artificial
+- Algunos scripts incluyen técnicas de **Inteligencia Artificial** para:
+  - Mejorar la precisión en la extracción de datos.
+  - Clasificar información y predecir relaciones entre datos.
+- Estas implementaciones hacen que el scraping sea más eficiente y robusto.
+
 
 ## Requisitos Previos
 
@@ -15,6 +36,7 @@ Antes de instalar y ejecutar AJUY, asegúrese de tener instalado:
 
 - **Python 3.8** o superior.
 - **pip**: El gestor de paquetes de Python.
+- **MongoDB**: Asegúrese de tener una instancia de MongoDB en funcionamiento.
 
 ## Instalación
 
@@ -55,11 +77,18 @@ Esto iniciará el servidor en `http://127.0.0.1:8000`. Puede acceder a la docume
 
 ## Estructura del Proyecto
 
-- **FastAPI/**: Contiene los módulos principales de la aplicación.
-- **data/**: Directorio para almacenar datos utilizados o generados por la aplicación.
-- **scripts/**: Scripts auxiliares para tareas como migraciones, carga de datos, etc.
-- **requirements.txt**: Archivo que lista las dependencias del proyecto.
-- **.gitignore**: Archivos y directorios que Git ignorará.
+- **FastAPI/**: Contiene los módulos principales de la aplicación, como rutas y lógica del servidor.
+- **APISEARCH/**: Incluye los scripts y módulos responsables del scraping de datos y su procesamiento.
+- **data/**: Almacena los datos recopilados y procesados por la aplicación.
+- **scripts/**: Incluye:
+  - Scripts responsables del scraping.
+  - Scripts que implementan funcionalidades de IA.
+- **requirements.txt**: Lista las dependencias necesarias para ejecutar el proyecto.
+- **.gitignore**: Archivos y directorios ignorados por Git.
+
+## Conclusión
+
+AJUY es una solución innovadora para centralizar información dispersa sobre investigadores y sus trabajos, utilizando técnicas avanzadas de scraping y **Inteligencia Artificial** para garantizar la calidad y utilidad de los datos recopilados.
 
 ## Contribuciones
 
