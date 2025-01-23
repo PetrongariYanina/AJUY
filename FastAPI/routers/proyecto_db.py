@@ -15,6 +15,12 @@ router = APIRouter(prefix="/proyectos",
 # Cuenta todos los proyectos
 @router.get("/count", response_model=int)
 async def count_proyectos():
+    """
+   Cuenta el número total de proyectos en la base de datos.
+
+   Retorna:
+   - int: Número total de proyectos
+   """
     count = db_client.proyectos.count_documents({})
     return count
 
@@ -22,6 +28,15 @@ async def count_proyectos():
 #Encuentra proyecto por id proyecto
 @router.get("/{id}", response_model=Proyecto) 
 async def proyectos(id: str) -> Proyecto:
+    """
+   Recupera un proyecto específico por su ID, incluyendo detalles de los investigadores.
+
+   Parámetros:
+   - id (str): Identificador único del proyecto
+
+   Retorna:
+   - Proyecto: Detalles del proyecto con información de los investigadores
+   """
     pipeline = [
         {"$match": {"_id": ObjectId(id)}},
         {"$lookup": {
@@ -37,6 +52,15 @@ async def proyectos(id: str) -> Proyecto:
 #Encuentra proyectos por id investigador
 @router.get("/autor/{id}", response_model=Page[Proyecto]) 
 async def proyectos(id: str) -> Page[Proyecto]:
+    """
+   Recupera una lista paginada de proyectos de un investigador específico.
+
+   Parámetros:
+   - id (str): Identificador único del investigador
+
+   Retorna:
+   - Page[Proyecto]: Página de proyectos del investigador, ordenados por título
+   """
     pipeline = [
             {"$match": {"Investigadores": ObjectId(id)}},
             {"$lookup": {
