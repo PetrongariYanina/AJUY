@@ -1,7 +1,7 @@
 
 # AJUY
 
-AJUY es una aplicación desarrollada con **FastAPI** que permite [descripción breve de la funcionalidad principal de la aplicación].
+El proyecto AJUY tiene como finalidad scrapear sitios web para recopilar información sobre investigadores, sus publicaciones, tesis y patentes, consolidándola en una base de datos unificada. Esto es especialmente útil dado que, generalmente, cada universidad mantiene registros independientes de sus autores y publicaciones.
 
 ## Características
 
