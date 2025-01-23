@@ -1,5 +1,5 @@
-env
-.env
+env-ajuy
+.env-ajuy
 proyfinal
 fastapi
 __pycache__
