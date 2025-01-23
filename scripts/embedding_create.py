@@ -1,3 +1,4 @@
+# Importación de librerías necesarias
 from sentence_transformers import SentenceTransformer
 from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
@@ -7,21 +8,30 @@ import traceback
 import sys
 import pymongo
 
+# Configuración del logger para registrar eventos
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('embedding_generation.log'),
-        logging.StreamHandler(sys.stdout)
+        logging.FileHandler('embedding_generation.log'),  # Guardar logs en archivo
+        logging.StreamHandler(sys.stdout)  # Mostrar logs en la consola
     ]
 )
 logger = logging.getLogger(__name__)
 
+# URL de conexión a la base de datos MongoDB
 MONGO_URI = "mongodb+srv://alopma83:1234@cluster0.anxmn.mongodb.net/Proyecto?retryWrites=true&w=majority"
+
+# Carga del modelo de embeddings de SentenceTransformer
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 
 def safe_str(value):
-    """Convierte de forma segura cualquier valor a string"""
+    """
+    Convierte de forma segura cualquier valor a string.
+    - Si el valor es None, retorna una cadena vacía.
+    - Si el valor es una lista, combina los elementos en una sola cadena.
+    - Si el valor no es una lista ni None, lo convierte directamente a string.
+    """
     if value is None:
         return ""
     if isinstance(value, list):
@@ -29,7 +39,13 @@ def safe_str(value):
     return str(value)
 
 def get_campos_embedding(collection_name):
-    """Obtener campos para generar embedding según la colección"""
+    """
+    Obtiene los campos que se deben usar para generar el embedding en función de la colección.
+    - Parámetro:
+      - collection_name (str): Nombre de la colección.
+    - Retorna:
+      - Lista de campos específicos para la colección dada.
+    """
     campos_mapping = {
         'autores': ['Nombre', 'Email', 'URL_del_perfil'],
         'publicaciones': ['Título', 'Resumen', 'Palabras_clave'],
@@ -37,15 +53,23 @@ def get_campos_embedding(collection_name):
         'proyectos': ['Título', 'Tipo', 'Organismo Financiador'],
         'patentes': ['Título', 'Resumen', 'URL']
     }
-    # Extraer el nombre de la colección sin el prefijo
+    # Extrae el nombre base de la colección (sin prefijo)
     collection_key = collection_name.lower().split('.')[-1]
     return campos_mapping.get(collection_key, [])
 
 async def generate_embeddings():
-    client = None
-    collection_stats = {}  # Estadísticas detalladas por colección
+    """
+    Genera embeddings para los documentos almacenados en MongoDB:
+    1. Conecta a la base de datos.
+    2. Itera por cada colección, identificando documentos sin embedding.
+    3. Genera embeddings para estos documentos y actualiza la base de datos.
+    4. Registra estadísticas y errores del proceso.
+    """
+    client = None  # Cliente MongoDB
+    collection_stats = {}  # Diccionario para estadísticas detalladas por colección
 
     try:
+        # Configuración de opciones para la conexión a MongoDB
         connection_options = {
             'socketTimeoutMS': 60000,
             'connectTimeoutMS': 60000,
@@ -56,11 +80,11 @@ async def generate_embeddings():
         
         logger.info("Intentando conectar a MongoDB...")
         
+        # Conexión al cliente MongoDB
         client = AsyncIOMotorClient(MONGO_URI, **connection_options)
-        
-        db = client.Proyecto
-        
-        # Listar colecciones
+        db = client.Proyecto  # Seleccionar la base de datos
+
+        # Listar las colecciones disponibles en la base de datos
         collection_names = await db.list_collection_names()
         logger.info(f"Colecciones encontradas: {collection_names}")
         
@@ -68,6 +92,7 @@ async def generate_embeddings():
         total_processed = 0
         total_errors = 0
         
+        # Iterar sobre cada colección
         for collection_name in collection_names:
             try:
                 collection = db[collection_name]
@@ -81,15 +106,15 @@ async def generate_embeddings():
                     'errores': 0
                 }
                 
-                # Total de documentos en la colección
+                # Contar documentos en la colección
                 total_docs = await collection.count_documents({})
                 collection_stats[collection_name]['total_documentos'] = total_docs
                 
-                # Documentos sin embedding
+                # Contar documentos sin embedding
                 docs_without_embedding = await collection.count_documents({"embedding": {"$exists": False}})
                 collection_stats[collection_name]['documentos_sin_embedding'] = docs_without_embedding
                 
-                # Documentos con embedding existente
+                # Contar documentos con embedding existente
                 docs_with_embedding = await collection.count_documents({"embedding": {"$exists": True}})
                 collection_stats[collection_name]['documentos_con_embedding_existente'] = docs_with_embedding
                 
@@ -97,13 +122,13 @@ async def generate_embeddings():
                 processed_in_collection = 0
                 errors_in_collection = 0
                 
-                # Obtener campos para embedding de esta colección
+                # Obtener los campos relevantes para esta colección
                 campos_para_embedding = get_campos_embedding(collection_name)
                 
-                # Limitar documentos procesados para evitar sobrecarga
+                # Procesar documentos faltantes de embedding
                 async for doc in collection.find({"embedding": {"$exists": False}}):
                     try:
-                        # Generar texto para embedding
+                        # Construir el texto base para el embedding combinando los campos relevantes
                         texto_para_embedding = ""
                         for campo in campos_para_embedding:
                             valor = doc.get(campo, '')
@@ -113,17 +138,17 @@ async def generate_embeddings():
                         texto_para_embedding = texto_para_embedding.strip()
                         
                         if texto_para_embedding:
-                            # Generar embedding
+                            # Generar embedding usando el modelo
                             embedding = model.encode(texto_para_embedding)
                             
-                            # Actualizar documento
+                            # Actualizar el documento en la base de datos
                             await collection.update_one(
                                 {"_id": doc["_id"]},
                                 {"$set": {"embedding": embedding.tolist(), "embedding_text": texto_para_embedding}}
                             )
                             processed_in_collection += 1
                             
-                            # Información de progreso
+                            # Log de progreso cada 10 documentos procesados
                             if processed_in_collection % 10 == 0:
                                 logger.info(f"Procesados {processed_in_collection} documentos en {collection_name}")
                         else:
@@ -131,11 +156,12 @@ async def generate_embeddings():
                             errors_in_collection += 1
                     
                     except Exception as doc_error:
+                        # Log de errores a nivel de documento
                         logger.error(f"Error procesando documento en {collection_name}: {doc_error}")
                         logger.error(traceback.format_exc())
                         errors_in_collection += 1
                 
-                # Actualizar estadísticas de la colección
+                # Actualizar estadísticas para la colección actual
                 collection_stats[collection_name]['documentos_procesados'] = processed_in_collection
                 collection_stats[collection_name]['errores'] = errors_in_collection
                 
@@ -143,9 +169,10 @@ async def generate_embeddings():
                 total_errors += errors_in_collection
             
             except Exception as collection_error:
+                # Log de errores a nivel de colección
                 logger.error(f"Error procesando colección {collection_name}: {collection_error}")
         
-        # Resumen detallado
+        # Log de resumen detallado
         logger.info("\n--- RESUMEN DETALLADO DE COLECCIONES ---")
         for collection, stats in collection_stats.items():
             logger.info(f"\nColección: {collection}")
@@ -155,26 +182,29 @@ async def generate_embeddings():
             logger.info(f"  Documentos procesados: {stats['documentos_procesados']}")
             logger.info(f"  Errores: {stats['errores']}")
         
-        # Resumen final
+        # Log de resumen final
         logger.info("\nProceso de generación de embeddings completado")
         logger.info(f"Total de documentos procesados: {total_processed}")
         logger.info(f"Total de errores: {total_errors}")
     
     except Exception as main_error:
+        # Log de errores generales
         logger.error(f"Error principal: {main_error}")
         logger.error(traceback.format_exc())
     
     finally:
-        # Asegurar cierre de conexión
+        # Asegurar el cierre de la conexión con MongoDB
         if client:
             client.close()
             logger.info("Conexión a MongoDB cerrada")
 
+# Punto de entrada principal del script
 if __name__ == "__main__":
     try:
-        asyncio.run(generate_embeddings())
+        asyncio.run(generate_embeddings())  # Ejecutar la función principal
     except KeyboardInterrupt:
         logger.info("Proceso interrumpido por el usuario")
     except Exception as e:
+        # Log de errores durante la ejecución
         logger.error(f"Error en la ejecución: {e}")
         logger.error(traceback.format_exc())
