@@ -15,12 +15,27 @@ router = APIRouter(prefix="/tesis",
 # Cuenta todas las tesis
 @router.get("/count", response_model=int)
 async def count_tesis():
+    """
+   Cuenta el número total de tesis en la base de datos.
+
+   Retorna:
+   - int: Número total de tesis
+   """
     count = db_client.tesis.count_documents({})
     return count
 
 # Encuentra tesis por id tesis
 @router.get("/{id}", response_model=Tesis) 
 async def tesis(id: str) -> Tesis:
+    """
+   Recupera una tesis específica por su ID, incluyendo detalles de autores y directores.
+
+   Parámetros:
+   - id (str): Identificador único de la tesis
+
+   Retorna:
+   - Tesis: Detalles de la tesis con información de autores y directores
+   """
     pipeline = [
         {"$match": {"_id": ObjectId(id)}},
         {"$lookup": {
@@ -42,6 +57,15 @@ async def tesis(id: str) -> Tesis:
 # Encuentra tesis por id autor
 @router.get("/autor/{id}", response_model=Page[Tesis])
 async def tesis(id: str) -> Page[Tesis]:
+    """
+   Recupera una lista paginada de tesis relacionadas con un autor específico.
+
+   Parámetros:
+   - id (str): Identificador único del autor
+
+   Retorna:
+   - Page[Tesis]: Página de tesis donde el autor es autor o director, ordenadas por título
+   """
     pipeline = [
         {"$match": {"$or": [{"Autores": ObjectId(id)}, {"Director/a": ObjectId(id)}]}},
         {"$lookup": {

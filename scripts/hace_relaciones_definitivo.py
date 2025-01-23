@@ -1,9 +1,10 @@
 from pymongo import MongoClient
 import json
 import time
+import os
 
 # Conexión a MongoDB con timeout aumentado
-client = MongoClient("localhost:27017", serverSelectionTimeoutMS=30000)
+client = os.getenv("MONGODB_URL")
 db = client["Proyecto"]
 autores_col = db["autores"]
 publicaciones_col = db["publicaciones"]
@@ -20,6 +21,26 @@ patentes_col.delete_many({})
 autores_col.delete_many({})
 
 def isAutorInText(text: str, nombre: str, apellido: str):
+    """
+    Verifica si un nombre de autor está presente en un texto dado.
+
+    Esta función comprueba si tanto el nombre como el apellido de un autor 
+    están presentes en un texto, independientemente de las mayúsculas o minúsculas.
+
+    Parámetros:
+    - text (str): El texto en el que se realizará la búsqueda
+    - nombre (str): El nombre del autor a buscar
+    - apellido (str): El apellido del autor a buscar
+
+    Retorna:
+    - bool: True si tanto el nombre como el apellido están en el texto, False en caso contrario
+
+    Ejemplo:
+    >>> isAutorInText("Juan Perez es un investigador", "Juan", "Perez")
+    True
+    >>> isAutorInText("Maria Lopez trabaja aquí", "Juan", "Perez")
+    False
+    """
     if not text:
         return False
     text = text.lower()
@@ -28,6 +49,27 @@ def isAutorInText(text: str, nombre: str, apellido: str):
     return nombre in text and apellido in text
 
 def isAutorInList(list: list, nombre: str, apellido: str):
+    """
+    Verifica si un autor está presente en alguno de los elementos de una lista.
+
+    Esta función recorre cada elemento de una lista y utiliza isAutorInText() 
+    para comprobar si el nombre y apellido del autor están presentes en alguno 
+    de los elementos de la lista.
+
+    Parámetros:
+    - list (list): Lista de textos donde se realizará la búsqueda
+    - nombre (str): El nombre del autor a buscar
+    - apellido (str): El apellido del autor a buscar
+
+    Retorna:
+    - bool: True si el autor se encuentra en algún elemento de la lista, False en caso contrario
+
+    Ejemplo:
+    >>> isAutorInList(["Juan Perez", "Maria Lopez"], "Juan", "Perez")
+    True
+    >>> isAutorInList(["Maria Lopez", "Carlos Gomez"], "Juan", "Perez")
+    False
+    """
     if not list:
         return False
     for t in list:
