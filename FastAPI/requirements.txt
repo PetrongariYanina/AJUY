@@ -1,0 +1,5 @@
+fastapi-pagination
+fastapi[all]
+uvicorn
+pymongo
+python-dotenv
