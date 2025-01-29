@@ -66,7 +66,7 @@ class AutocompleteResponse(BaseModel):
 
 app = FastAPI(title="API de Búsqueda Académica")
 
-mongodb_url = os.getenv("MONGODB_URL", "mongodb+srv://alopma83:1234@cluster0.anxmn.mongodb.net/Proyecto?retryWrites=true&w=majority")
+mongodb_url = os.getenv("MONGODB_URL")
 if not mongodb_url:
     raise ValueError("La variable de entorno 'MONGODB_URL' no está configurada.")
 
