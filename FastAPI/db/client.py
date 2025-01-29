@@ -2,7 +2,7 @@ import os
 from pymongo import MongoClient
 
 # Obtener la variable de entorno directamente
-mongodb_url = ("mongodb+srv://alopma83:1234@cluster0.anxmn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+mongodb_url = (MONGODB_URL)
 
 # Manejar el caso en que no esté configurada
 if not mongodb_url:
